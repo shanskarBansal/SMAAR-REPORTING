@@ -1,7 +1,6 @@
                                 # ------------------------------------© SHANSKAR BANSAL ©------------------------------------# 
                                 # -----------------------------        streamlit-Smaar_Tagging       -------------------------------#
 
-
 import pandas as pd
 import re
 import nltk
@@ -27,7 +26,6 @@ warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hu
 #     return gspread.authorize(creds)
 
 def get_gspread_client():
-    # Load credentials from Streamlit's secrets directly as a dictionary
     creds = service_account.Credentials.from_service_account_info(
         st.secrets["gcp_service_account"],
         scopes=["https://www.googleapis.com/auth/spreadsheets"]
@@ -40,23 +38,36 @@ def get_sheet_data(sheet_id):
     sheet = client.open_by_key(sheet_id)
     return sheet
 
-st.title("Google Sheet Data Processor")
+st.title("Morcha Sheet Data Processor")
 sheet_id = st.text_input("Enter the ID of your Google Sheet:", "")
+
+st.sidebar.image('https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg', width=200)
+st.sidebar.info("""
+        This app was created by:
+        - YOGENDRA_PRATAP                
+        - SHANSKAR_BANSAL
+        - KRISHAN_MAGGO
+
+        """)
+st.sidebar.markdown("---")
+st.sidebar.markdown("© Varahe Analytics Private Limited")
 
 if sheet_id:
     client = get_gspread_client()
     sheet = get_sheet_data(sheet_id)
+    sheet_names = [worksheet.title for worksheet in sheet.worksheets()] 
 
     nltk.download('punkt')
     nltk.download('stopwords')
     stop_words = set(stopwords.words('english'))
     custom_tokens_to_remove = set()
 
-    sheet_names_to_process = ['OBC X', 'KM X', 'MM X', 'KM_Insta', 'OBC_Insta', 'MM_Insta', 'MM_FB', 'OBC_FB', 'KM_FB']
     sentences_column = 'Post Caption'
     ground_truth_column = 'Post Owner'
     model = SentenceTransformer('all-mpnet-base-v2')
-    selected_sheet_name = st.selectbox("Select a sheet to process:", sheet_names_to_process)
+    selected_sheet_name = st.selectbox("Select a sheet to process:", sheet_names)
+
+    
     def clean_translate_tokenize(text):
         if pd.notna(text):
             parts = text.split('#', 1)
@@ -91,7 +102,8 @@ if sheet_id:
         return 0.8
 
     varahe_worksheet = sheet.worksheet('Captions')
-    varahe_data = varahe_worksheet.get_all_records()
+    expected_headers = ['Post Caption']  
+    varahe_data = varahe_worksheet.get_all_records(expected_headers=expected_headers)
     varahe_df = pd.DataFrame(varahe_data)
 
     with ThreadPoolExecutor() as executor:
