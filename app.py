@@ -1,5 +1,6 @@
-                                    # ------------------------------------© SHANSKAR BANSAL ©------------------------------------# 
-                                    # -----------------------------        Smaar - Reporting       -------------------------------#
+                                # ------------------------------------© SHANSKAR BANSAL ©------------------------------------# 
+                                # -----------------------------        streamlit-Smaar_Tagging       -------------------------------#
+
 
 import pandas as pd
 import re
@@ -14,15 +15,25 @@ import matplotlib.pyplot as plt
 from sentence_transformers import SentenceTransformer, util
 import gspread
 from oauth2client.service_account import ServiceAccountCredentials
+from google.oauth2 import service_account
 import streamlit as st
 import warnings
 
 warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub.file_download")
 
+# def get_gspread_client():
+#     scope = ['https://www.googleapis.com/auth/spreadsheets']
+#     creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
+#     return gspread.authorize(creds)
+
 def get_gspread_client():
-    scope = ['https://www.googleapis.com/auth/spreadsheets']
-    creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
-    return gspread.authorize(creds)
+    # Load credentials from Streamlit's secrets directly as a dictionary
+    creds = service_account.Credentials.from_service_account_info(
+        st.secrets["gcp_service_account"],
+        scopes=["https://www.googleapis.com/auth/spreadsheets"]
+    )
+    client = gspread.authorize(creds)
+    return client
 
 def get_sheet_data(sheet_id):
     client = get_gspread_client()
