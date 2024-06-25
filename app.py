@@ -17,6 +17,8 @@ from oauth2client.service_account import ServiceAccountCredentials
 from google.oauth2 import service_account
 import streamlit as st
 import warnings
+import streamlit.components.v1 as components
+
 
 warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub.file_download")
 
