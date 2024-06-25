@@ -41,7 +41,7 @@ def get_sheet_data(sheet_id):
 st.title("Morcha Sheet Data Processor")
 sheet_id = st.text_input("Enter the ID of your Google Sheet:", "")
 
-st.sidebar.image('https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg', style="width: 100px;border-radius: 20px;box-shadow: 5px 5px #2691a9;")
+st.sidebar.image('https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg',width=100)
 st.sidebar.info("""
         This app was created by:
         - YOGENDRA_PRATAP                
