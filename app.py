@@ -38,15 +38,25 @@ def get_sheet_data(sheet_id):
     sheet = client.open_by_key(sheet_id)
     return sheet
 
-st.title("Morcha Sheet Data Processor")
+html_content = """
+<div style="
+    border-radius: 20px;
+    box-shadow: 5px 5px 5px #2691a9;
+    overflow: hidden;
+">
+    <img src="https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg" 
+         style="width: 100px; height: auto;">
+</div>
+"""
+components.html(html_content, height=120) 
+
+
+st.title("Morcha Sheet Data Tagging")
 sheet_id = st.text_input("Enter the ID of your Google Sheet:", "")
 
-st.sidebar.image('https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg',width=100)
 st.sidebar.info("""
         This app was created by:
-        - YOGENDRA_PRATAP                
-        - SHANSKAR_BANSAL
-        - KRISHAN_MAGGO
+        - COMMS ANALYTICS TEAMS
 
         """)
 st.sidebar.markdown("---")
