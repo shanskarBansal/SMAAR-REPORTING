@@ -134,7 +134,7 @@ def app_first_block():
                 if df.empty:
                     st.write(f"DataFrame is empty after loading data for {selected_sheet_name}")
                 else:
-                    st.write(f"Data loaded for {selected_sheet_name}: {df.head()}")
+                    st.write(f"Data loaded for {selected_sheet_name}")
         
                 df[sentences_column] = df[sentences_column].astype(str).fillna('')
         
