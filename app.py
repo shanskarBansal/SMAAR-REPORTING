@@ -20,6 +20,7 @@ def app_first_block():
     import warnings
     import streamlit.components.v1 as components
     
+    
     warnings.filterwarnings("ignore", category=FutureWarning, module="huggingface_hub.file_download")
     
     def get_gspread_client():
@@ -185,6 +186,8 @@ def app_second_block():
     from oauth2client.service_account import ServiceAccountCredentials
     from datetime import datetime, timedelta
     import time
+    from googleapiclient.discovery import build
+
     
     
     # scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
@@ -199,6 +202,29 @@ def app_second_block():
     client = gspread.authorize(creds)
 
 
+    creds_jsons = st.secrets["script_service_account"]
+    scoped = [
+    'https://www.googleapis.com/auth/script.projects',
+    'https://www.googleapis.com/auth/drive',
+    'https://www.googleapis.com/auth/documents',  
+    'https://www.googleapis.com/auth/spreadsheets'  
+    ]
+    creddd = ServiceAccountCredentials.from_json_keyfile_dict(creds_jsons, scoped)
+
+    def scripting(creds):
+        delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
+        service = build('script', 'v1', credentials=delegated_creds)
+        script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
+        function_name = 'processData'
+        request = {
+            'function': function_name,
+            'devMode': True  
+        }
+        try:
+            response = service.scripts().run(body=request, scriptId=script_id).execute()
+            st.write('Function executed successfully:', response) 
+        except Exception as e:
+            st.write(f"Error executing Apps Script: {str(e)}")
 
     def create_weekly_sheet_copy(client, spreadsheet, base_sheet_name):
         current_week_number = datetime.now().isocalendar().week
@@ -379,7 +405,9 @@ def app_second_block():
         posting_sheet_link = st.text_input("Posting sheet link")
         posting_sheet_name = st.text_input("Posting sheet Name")
         if repo_sheet_path and repo_sheet_name and current_week_link and current_week_fb_sheet_name and current_week_IG_sheet_name and previous_week_link and previous_week_fb_sheet_name and previous_week_IG_sheet_name and posting_sheet_link and posting_sheet_name:
-            run_code(repo_sheet_path, repo_sheet_name, current_week_link, current_week_fb_sheet_name, current_week_IG_sheet_name, previous_week_link, previous_week_fb_sheet_name, previous_week_IG_sheet_name,posting_sheet_link,posting_sheet_name)
+            process_button = st.button('Process Sheet')
+            if process_button:
+                run_code(repo_sheet_path, repo_sheet_name, current_week_link, current_week_fb_sheet_name, current_week_IG_sheet_name, previous_week_link, previous_week_fb_sheet_name, previous_week_IG_sheet_name,posting_sheet_link,posting_sheet_name)
     
     def run_code(repo_sheet_path, repo_sheet_name, current_week_link, current_week_fb_sheet_name, current_week_IG_sheet_name, previous_week_link, previous_week_fb_sheet_name, previous_week_IG_sheet_name,posting_sheet_link,posting_sheet_name):
         official_fb_data = read_files(client,current_week_link,current_week_fb_sheet_name)
@@ -459,7 +487,10 @@ def app_second_block():
         st.write("Offical Smaar Data is Updated")
         if ss:        
             posting_sheet = client.open_by_url(posting_sheet_link)
-            create_weekly_sheet_copy(client, posting_sheet, posting_sheet_name)                                 
+            dd = create_weekly_sheet_copy(client, posting_sheet, posting_sheet_name)  
+            if dd:
+                scripting(creddd)
+                               
     if __name__ == "__main__":
         main()    
 
