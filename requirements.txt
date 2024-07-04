@@ -14,3 +14,4 @@ requests
 db-dtypes
 pyarrow
 streamlit-aggrid
+google-api-python-client
