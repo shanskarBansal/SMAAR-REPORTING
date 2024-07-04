@@ -187,6 +187,10 @@ def app_second_block():
     from datetime import datetime, timedelta
     import time
     from googleapiclient.discovery import build
+    from google.oauth2 import service_account
+    import tempfile
+
+
 
     
     
@@ -209,7 +213,7 @@ def app_second_block():
     'https://www.googleapis.com/auth/documents',  
     'https://www.googleapis.com/auth/spreadsheets'  
     ]
-    creddd = ServiceAccountCredentials.from_json_keyfile_dict(creds_jsons, scoped)
+    creddd = service_account.Credentials.from_service_account_file(creds_jsons, scopes=scoped)
 
     def scripting(creds):
         delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
