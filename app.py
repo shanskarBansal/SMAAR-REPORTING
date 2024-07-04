@@ -201,20 +201,16 @@ def app_second_block():
     client = gspread.authorize(creds)
 
 
-    Google_api_credential_file = dict(st.secrets["script_service_account"])
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
-        temp_file.write(json.dumps(Google_api_credential_file).encode())
-        
-        
-    creddd = service_account.Credentials.from_service_account_info(
-        temp_file,
-        scoped = [
+
+    creds_jsons = st.secrets["script_service_account"]
+    scoped = [
         'https://www.googleapis.com/auth/script.projects',
         'https://www.googleapis.com/auth/drive',
         'https://www.googleapis.com/auth/documents',  
-        'https://www.googleapis.com/auth/spreadsheets'  
+        'https://www.googleapis.com/auth/spreadsheets' 
         ]
-    )
+    creddd = ServiceAccountCredentials.from_json_keyfile_dict(creds_jsons, scoped)
+
 
     def scripting(creddd):
         delegated_creds = creddd.with_subject('krishan.maggo@varaheanalytics.com') 
