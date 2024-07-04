@@ -201,7 +201,7 @@ def app_second_block():
     client = gspread.authorize(creds)
 
 
-    Google_api_credential_file = dict(st.secrets["script_service_account"])
+    Google_api_credential_file = (st.secrets["script_service_account"])
     with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
         temp_file.write(json.dumps(Google_api_credential_file).encode())
         temp_file_path = temp_file.name
