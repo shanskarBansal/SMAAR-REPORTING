@@ -206,7 +206,7 @@ def app_second_block():
         temp_file.write(json.dumps(Google_api_credential_file).encode())
         temp_file_path = temp_file.name
 
-    creddd = service_account.Credentials.from_service_account_info(
+    creddd =  ServiceAccountCredentials.from_json_keyfile_dict(
         temp_file.name,
         scoped = [
         'https://www.googleapis.com/auth/script.projects',
