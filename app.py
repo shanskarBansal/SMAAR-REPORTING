@@ -3,7 +3,7 @@
 import streamlit as st
 import streamlit.components.v1 as components
 
-    def app_first_block():
+def app_first_block():
         import pandas as pd
         import re
         import nltk
@@ -179,7 +179,7 @@ import streamlit.components.v1 as components
 
                                     # -----------------------------       OFFICIAL-SMAAR-REPORT       -------------------------------#
 
-    def app_second_block():
+def app_second_block():
         # Import all the library
         
         import streamlit as st
@@ -193,7 +193,6 @@ import streamlit.components.v1 as components
         from google.auth.transport.requests import Request
         from googleapiclient.discovery import build
         from google.oauth2 import service_account
-        
         
         # scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
         # creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
@@ -447,6 +446,7 @@ import streamlit.components.v1 as components
             result_sheet_data.update([result_df.columns.values.tolist()] + result_df.values.tolist())
             st.write("Offical Smaar Data is Updated")
 
+
         def create_weekly_sheet_copy(client, spreadsheet, base_sheet_name):
             current_week_number = datetime.now().isocalendar().week
             new_sheet_name = f"Week_{current_week_number-1}"
@@ -464,98 +464,105 @@ import streamlit.components.v1 as components
                 )
                 return f"Created new worksheet: {new_sheet_name}", True
 
+        def execute_apps_script():
+            # Set up OAuth 2.0 credentials flow with required scopes
+            SCOPES = [
+                'https://www.googleapis.com/auth/script.projects',
+                'https://www.googleapis.com/auth/drive',
+                'https://www.googleapis.com/auth/documents',  # Add this scope for Google Docs
+                'https://www.googleapis.com/auth/spreadsheets'  # If you also interact with Google Sheets
+            ]
 
-      def execute_script():
-          # Set up OAuth 2.0 credentials flow with required scopes
-          SCOPES = [
-              'https://www.googleapis.com/auth/script.projects',
-              'https://www.googleapis.com/auth/drive',
-              'https://www.googleapis.com/auth/documents',  # Add this scope for Google Docs
-              'https://www.googleapis.com/auth/spreadsheets'  # If you also interact with Google Sheets
-          ]
-      
-          SERVICE_ACCOUNT_FILE = st.secrets["script_service_account"]  # Path to your service account key file
-      
-          creds = service_account.Credentials.from_service_account_file(
-              SERVICE_ACCOUNT_FILE, scopes=SCOPES)
-      
-          # Delegate the credentials to a specific user in the domain
-          delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com')  # Replace with the user's email
-      
-          # Build the service for the Google Apps Script API
-          service = build('script', 'v1', credentials=delegated_creds)
-      
-          # The ID of the script to call
-          script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
-      
-          # The name of the function to execute in the script
-          function_name = 'processData'
-      
-          # Create execution request
-          request = {
-              'function': function_name,
-              'devMode': True  # Optional: Whether to run in development mode
-          }
-      
-          # Execute Apps Script function
-          try:
-              response = service.scripts().run(body=request, scriptId=script_id).execute()
-              
-              # Add a delay before continuing with further operations
-              time.sleep(10)  # Wait for 10 seconds
-      
-              # Continue with further operations after the delay
-              # Additional code here...
-      
-              return response
-      
-          except Exception as e:
-              return f"Error executing Apps Script: {str(e)}"
+            SERVICE_ACCOUNT_FILE = st.secrets["script_service_account"]  # Path to your service account key file
 
-# Call the function
-response = execute_script()
-"""
+            creds = service_account.Credentials.from_service_account_file(
+                SERVICE_ACCOUNT_FILE, scopes=SCOPES)
 
-with open("script_executor.py", "w") as file:
-    file.write(script_content)
+            # Delegate the credentials to a specific user in the domain
+            delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com')  # Replace with the user's email
 
-            
-            if __name__ == "__main__":
-                main()    
+            # Build the service for the Google Apps Script API
+            service = build('script', 'v1', credentials=delegated_creds)
 
+            # The ID of the script to call
+            script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
+
+            # The name of the function to execute in the script
+            function_name = 'processData'
+
+            # Create execution request
+            request = {
+                'function': function_name,
+                'devMode': True  # Optional: Whether to run in development mode
+            }
+
+            # Execute Apps Script function
+            try:
+                response = service.scripts().run(body=request, scriptId=script_id).execute()
+                
+                # Add a delay before continuing with further operations
+                time.sleep(10)  # Wait for 10 seconds
+
+                return response
+
+            except Exception as e:
+                return f"Error executing Apps Script: {str(e)}"
 
         def main():
-            if 'selected_function' not in st.session_state:
-                st.session_state.selected_function = None
+            # Set up the Google Sheets client
+            gc = gspread.service_account(filename=st.secrets["gspread_service_account"])  # Path to your service account key file for gspread
+            posting_sheet_link = st.secrets["posting_sheet_link"]  # The link to your Google Sheet
+            posting_sheet_name = st.secrets["posting_sheet_name"]  # The base sheet name to duplicate
 
-            with st.sidebar:
-                option = st.radio(
-                    "Select which function you want to run:",
-                    ('MORCHA_REPORT', 'OFFICIAL_REPORT'),
-                    on_change=lambda: st.session_state.update({"selected_function": None})
-                )
+            # Get the spreadsheet object to use for creating a new sheet
+            posting_sheet = gc.open_by_url(posting_sheet_link)
+            
+            # Call create_weekly_sheet_copy function
+            msg, success = create_weekly_sheet_copy(gc, posting_sheet, posting_sheet_name)
+            st.write(msg)
+            
+            if success:
+                # Call execute_apps_script function if create_weekly_sheet_copy is successful
+                response = execute_apps_script()
+                st.write(response)
 
-                if st.button("OK"):
-                    st.session_state.selected_function = option
+            if __name__ == "__main__":
+                main()
+        
 
-            if not st.session_state.selected_function:      
-                html_content = """
-                <div style="
-                    border-radius: 20px;
-                    box-shadow: 5px 5px 5px #2691a9;
-                    overflow: hidden;
-                ">
-                    <img src="https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg" 
-                        style="width: 100px; height: auto;">
-                </div>
-                """
-                components.html(html_content, height=120)      
-                st.title("Choose the operation to perform")
 
-            if st.session_state.selected_function == 'MORCHA_REPORT':
-                app_first_block()
-            elif st.session_state.selected_function == 'OFFICIAL_REPORT':
-                app_second_block()
+            def main():
+                if 'selected_function' not in st.session_state:
+                    st.session_state.selected_function = None
 
-    if __name__ == "__main__":
-        main()
+                with st.sidebar:
+                    option = st.radio(
+                        "Select which function you want to run:",
+                        ('MORCHA_REPORT', 'OFFICIAL_REPORT'),
+                        on_change=lambda: st.session_state.update({"selected_function": None})
+                    )
+
+                    if st.button("OK"):
+                        st.session_state.selected_function = option
+
+                if not st.session_state.selected_function:      
+                    html_content = """
+                    <div style="
+                        border-radius: 20px;
+                        box-shadow: 5px 5px 5px #2691a9;
+                        overflow: hidden;
+                    ">
+                        <img src="https://media.licdn.com/dms/image/C4D0BAQHxlx31iRVpcQ/company-logo_200_200/0/1654155578017?e=1726099200&v=beta&t=41pCBzTxlFnZG43IlklTbQpRnirE8szdB27p8zN2HFg" 
+                            style="width: 100px; height: auto;">
+                    </div>
+                    """
+                    components.html(html_content, height=120)      
+                    st.title("Choose the operation to perform")
+
+                if st.session_state.selected_function == 'MORCHA_REPORT':
+                    app_first_block()
+                elif st.session_state.selected_function == 'OFFICIAL_REPORT':
+                    app_second_block()
+
+        if __name__ == "__main__":
+            main()
