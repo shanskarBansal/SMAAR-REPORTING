@@ -216,8 +216,7 @@ def app_second_block():
         ]
     )
 
-
-    def scripting(creddd):
+    def scripting(creds):
         delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
         service = build('script', 'v1', credentials=delegated_creds)
         script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
