@@ -206,16 +206,18 @@ def app_second_block():
     client = gspread.authorize(creds)
 
 
-    creds_jsons = st.secrets["script_service_account"]
-    scoped = [
-    'https://www.googleapis.com/auth/script.projects',
-    'https://www.googleapis.com/auth/drive',
-    'https://www.googleapis.com/auth/documents',  
-    'https://www.googleapis.com/auth/spreadsheets'  
-    ]
-    creddd = service_account.Credentials.from_service_account_file(creds_jsons, scopes=scoped)
+    creddd = service_account.Credentials.from_service_account_info(
+        st.secrets["script_service_account"],
+        scoped = [
+        'https://www.googleapis.com/auth/script.projects',
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/documents',  
+        'https://www.googleapis.com/auth/spreadsheets'  
+        ]
+    )
 
-    def scripting(creds):
+
+    def scripting(creddd):
         delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
         service = build('script', 'v1', credentials=delegated_creds)
         script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
