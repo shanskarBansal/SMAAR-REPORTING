@@ -189,24 +189,18 @@ def app_second_block():
     from googleapiclient.discovery import build
     from google.oauth2 import service_account
     import tempfile
-
-
-
-    
     
     # scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     # creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
     # client = gspread.authorize(creds)
     
-
-
     creds_json = st.secrets["gcp_service_account"]
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
     client = gspread.authorize(creds)
 
 
-    creddd = service_account.Credentials.from_service_account_info(
+    creddd = ServiceAccountCredentials.from_json_keyfile_dict(
         st.secrets["script_service_account"],
         scoped = [
         'https://www.googleapis.com/auth/script.projects',
@@ -216,8 +210,8 @@ def app_second_block():
         ]
     )
 
-    def scripting(creds):
-        delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
+    def scripting(creddd):
+        delegated_creds = creddd.with_subject('krishan.maggo@varaheanalytics.com') 
         service = build('script', 'v1', credentials=delegated_creds)
         script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
         function_name = 'processData'
