@@ -1,7 +1,7 @@
                                     # ------------------------------------© SHANSKAR BANSAL ©------------------------------------# 
                                     # -----------------------------        Morcha-Smaar_Tagging       -------------------------------#
-    import streamlit as st
-    import streamlit.components.v1 as components
+  import streamlit as st
+  import streamlit.components.v1 as components
 
     def app_first_block():
         import pandas as pd
