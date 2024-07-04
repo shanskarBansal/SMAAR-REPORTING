@@ -200,39 +200,37 @@ def app_second_block():
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
     client = gspread.authorize(creds)
 
-    def scripting():
-        Google_api_credential_file = dict(st.secrets["script_service_account"])
-        with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
-            temp_file.write(json.dumps(Google_api_credential_file).encode())
-            temp_file_path = temp_file.name
 
-        st.write(temp_file_path)
-        st.write(temp_file.name)
+    Google_api_credential_file = dict(st.secrets["script_service_account"])
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
+        temp_file.write(json.dumps(Google_api_credential_file).encode())
+        temp_file_path = temp_file.name
 
-    # creddd = service_account.Credentials.from_service_account_info(
-    #     st.secrets["script_service_account"],
-    #     scoped = [
-    #     'https://www.googleapis.com/auth/script.projects',
-    #     'https://www.googleapis.com/auth/drive',
-    #     'https://www.googleapis.com/auth/documents',  
-    #     'https://www.googleapis.com/auth/spreadsheets'  
-    #     ]
-    # )
 
-    # def scripting(creddd):
-    #     delegated_creds = creddd.with_subject('krishan.maggo@varaheanalytics.com') 
-    #     service = build('script', 'v1', credentials=delegated_creds)
-    #     script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
-    #     function_name = 'processData'
-    #     request = {
-    #         'function': function_name,
-    #         'devMode': True  
-    #     }
-    #     try:
-    #         response = service.scripts().run(body=request, scriptId=script_id).execute()
-    #         st.write('Function executed successfully:', response) 
-    #     except Exception as e:
-    #         st.write(f"Error executing Apps Script: {str(e)}")
+    creddd = service_account.Credentials.from_service_account_info(
+        temp_file,
+        scoped = [
+        'https://www.googleapis.com/auth/script.projects',
+        'https://www.googleapis.com/auth/drive',
+        'https://www.googleapis.com/auth/documents',  
+        'https://www.googleapis.com/auth/spreadsheets'  
+        ]
+    )
+
+    def scripting(creddd):
+        delegated_creds = creddd.with_subject('krishan.maggo@varaheanalytics.com') 
+        service = build('script', 'v1', credentials=delegated_creds)
+        script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
+        function_name = 'processData'
+        request = {
+            'function': function_name,
+            'devMode': True  
+        }
+        try:
+            response = service.scripts().run(body=request, scriptId=script_id).execute()
+            st.write('Function executed successfully:', response) 
+        except Exception as e:
+            st.write(f"Error executing Apps Script: {str(e)}")
 
     def create_weekly_sheet_copy(client, spreadsheet, base_sheet_name):
         current_week_number = datetime.now().isocalendar().week
@@ -415,8 +413,7 @@ def app_second_block():
         if repo_sheet_path and repo_sheet_name and current_week_link and current_week_fb_sheet_name and current_week_IG_sheet_name and previous_week_link and previous_week_fb_sheet_name and previous_week_IG_sheet_name and posting_sheet_link and posting_sheet_name:
             process_button = st.button('Process Sheet')
             if process_button:
-                scripting()
-                # run_code(repo_sheet_path, repo_sheet_name, current_week_link, current_week_fb_sheet_name, current_week_IG_sheet_name, previous_week_link, previous_week_fb_sheet_name, previous_week_IG_sheet_name,posting_sheet_link,posting_sheet_name)
+                run_code(repo_sheet_path, repo_sheet_name, current_week_link, current_week_fb_sheet_name, current_week_IG_sheet_name, previous_week_link, previous_week_fb_sheet_name, previous_week_IG_sheet_name,posting_sheet_link,posting_sheet_name)
     
     def run_code(repo_sheet_path, repo_sheet_name, current_week_link, current_week_fb_sheet_name, current_week_IG_sheet_name, previous_week_link, previous_week_fb_sheet_name, previous_week_IG_sheet_name,posting_sheet_link,posting_sheet_name):
         official_fb_data = read_files(client,current_week_link,current_week_fb_sheet_name)
@@ -498,7 +495,7 @@ def app_second_block():
             posting_sheet = client.open_by_url(posting_sheet_link)
             dd = create_weekly_sheet_copy(client, posting_sheet, posting_sheet_name)  
             if dd:
-                scripting()
+                scripting(creddd)
                                
     if __name__ == "__main__":
         main()    
