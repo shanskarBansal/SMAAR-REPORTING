@@ -178,7 +178,6 @@ def app_first_block():
 
 
 def app_second_block():
-    # Import all the library
     
     import streamlit as st
     import gspread
@@ -188,18 +187,13 @@ def app_second_block():
     import time
     from googleapiclient.discovery import build
     from google.oauth2 import service_account
-    import tempfile
-    import json
-    
-    # scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
-    # creds = ServiceAccountCredentials.from_json_keyfile_name('cred.json', scope)
-    # client = gspread.authorize(creds)
-    
+
+
+
     creds_json = st.secrets["gcp_service_account"]
     scope = ['https://spreadsheets.google.com/feeds','https://www.googleapis.com/auth/drive']
     creds = ServiceAccountCredentials.from_json_keyfile_dict(creds_json, scope)
     client = gspread.authorize(creds)
-
 
 
     creds_jsons = st.secrets["script_service_account"]
@@ -209,11 +203,11 @@ def app_second_block():
         'https://www.googleapis.com/auth/documents',  
         'https://www.googleapis.com/auth/spreadsheets' 
         ]
-    creddd = ServiceAccountCredentials.from_json_keyfile_dict(creds_jsons, scoped)
+    creddd = service_account.Credentials.from_service_account_file(creds_jsons, scoped)
 
 
-    def scripting(creddd):
-        delegated_creds = creddd.with_subject('krishan.maggo@varaheanalytics.com') 
+    def scripting(creds):
+        delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
         service = build('script', 'v1', credentials=delegated_creds)
         script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
         function_name = 'processData'
@@ -226,6 +220,7 @@ def app_second_block():
             st.write('Function executed successfully:', response) 
         except Exception as e:
             st.write(f"Error executing Apps Script: {str(e)}")
+
 
     def create_weekly_sheet_copy(client, spreadsheet, base_sheet_name):
         current_week_number = datetime.now().isocalendar().week
@@ -244,10 +239,12 @@ def app_second_block():
             )
             return f"Created new worksheet: {new_sheet_name}",True
 
+
     def remove_duplicate_posts(df,post_id):
         unique_df = df.drop_duplicates(subset= post_id, keep='first')
         return unique_df
-    
+
+
     def read_files(client,url,sheet_name):
         try:
             smaar_repo = client.open_by_url(url) 
@@ -256,14 +253,16 @@ def app_second_block():
             return df
         except Exception as ex:
             print(ex)
-    
+
+
     def remove_first_row(df):
         new_header = df.iloc[0]  
         df = df[1:]  
         df.columns = new_header  
         df.reset_index(drop=True, inplace=True)
         return df
-    
+
+
     def post_stats(df,post_id,permalink,likes,comments,shares,reach,engagement,impressions):
         if len(df)==0:
             list1 = ['']*7
@@ -284,7 +283,8 @@ def app_second_block():
             total_impression  = df[impressions].astype(int).sum()
             list1 = [total_post,total_post_likes,total_comments,total_shares,total_reach,total_engagment,total_impression]
         return list1
-    
+
+
     def content_performance(df,post_id,permalink,likes,comments,shares,reach,engagement,impressions):
         if len(df)==0:
             content = ['']*13
@@ -312,7 +312,8 @@ def app_second_block():
             content = [total_post,total_post_likes,avg_post_likes,total_comments,avg_comments,total_shares,avg_shares,
                        total_reach,avg_reach,total_engagement,avg_engagement,total_impressions,avg_impression]
         return content
-    
+
+
     def top_bottom_posts(df,post_id,reach,post_type,permalink,likes,comments,shares,engagements,impressions,message):
         if len(df)==0:
             flat_top_bottom_content = ['']*54
@@ -333,6 +334,7 @@ def app_second_block():
             last3_post_link = df.loc[third_smallest_index, [post_type,permalink,message, likes,comments, shares,reach,engagements,impressions]]
             flat_top_bottom_content = rank1_post_link.values.tolist() + rank2_post_link.values.tolist() + rank3_post_link.values.tolist() + last3_post_link.values.tolist() + last2_post_link.values.tolist() + last1_post_link.values.tolist()
         return flat_top_bottom_content
+ 
     def calculate_growth_with_conditions(df, numerator_col, denominator_col, result_col):
         df[numerator_col] = pd.to_numeric(df[numerator_col].replace(' ', '0'), errors='coerce').fillna(0)
         df[denominator_col] = pd.to_numeric(df[denominator_col].replace(' ', '0'), errors='coerce').fillna(0)
@@ -490,7 +492,9 @@ def app_second_block():
             posting_sheet = client.open_by_url(posting_sheet_link)
             dd = create_weekly_sheet_copy(client, posting_sheet, posting_sheet_name)  
             if dd:
-                scripting(creddd)
+                script_button = st.button('Run Script')
+                if script_button:
+                    scripting(creddd)
                                
     if __name__ == "__main__":
         main()    
