@@ -209,7 +209,7 @@ def app_second_block():
         temp_file.write(json.dumps(creds_jsons).encode())
     
     
-    creddd = service_account.Credentials.from_service_account_file(temp_file, scoped)
+    creddd = service_account.Credentials.from_service_account_file(temp_file.name, scoped)
 
 
     def scripting(creds):
