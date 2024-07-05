@@ -205,11 +205,12 @@ def app_second_block():
         'https://www.googleapis.com/auth/spreadsheets' 
         ]
     
-    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
+    with tempfile.NamedTemporaryFile() as temp_file:
         temp_file.write(json.dumps(creds_jsons).encode())
-    
-    
-    creddd = service_account.Credentials.from_service_account_file(temp_file.name, scoped)
+        temp_file.flush() 
+
+        creddd = service_account.Credentials.from_service_account_file(
+            temp_file.name, scopes=scoped)
 
 
     def scripting(creds):
