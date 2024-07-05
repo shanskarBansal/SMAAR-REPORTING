@@ -27,6 +27,7 @@ scoped = [
 
 with tempfile.NamedTemporaryFile() as temp_file:
     temp_file.write(json.dumps(creds_jsons).encode())
+    temp_file.flush() 
 
     creddd = service_account.Credentials.from_service_account_file(
         temp_file.name, scopes=scoped)
