@@ -186,8 +186,8 @@ def app_second_block():
     from datetime import datetime, timedelta
     import time
     from googleapiclient.discovery import build
-    from google.oauth2 import service_account
-
+    import tempfile
+    import json
 
 
     creds_json = st.secrets["gcp_service_account"]
@@ -203,8 +203,11 @@ def app_second_block():
         'https://www.googleapis.com/auth/documents',  
         'https://www.googleapis.com/auth/spreadsheets' 
         ]
-    creddd = service_account.Credentials.from_service_account_file(creds_jsons, scoped)
+    creddd = ServiceAccountCredentials.from_json_keyfile_dict(creds_jsons, scoped)
 
+
+    with tempfile.NamedTemporaryFile(delete=False, suffix=".json") as temp_file:
+        temp_file.write(json.dumps(creddd).encode())
 
     def scripting(creds):
         delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
@@ -494,7 +497,7 @@ def app_second_block():
             if dd:
                 script_button = st.button('Run Script')
                 if script_button:
-                    scripting(creddd)
+                    scripting(temp_file)
                                
     if __name__ == "__main__":
         main()    
