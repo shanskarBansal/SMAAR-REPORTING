@@ -210,7 +210,7 @@ def app_second_block():
         temp_file.flush() 
 
         creddd = service_account.Credentials.from_service_account_file(
-            temp_file.name, scopes=scoped)
+            temp_file, scopes=scoped)
 
 
     def scripting(creds):
