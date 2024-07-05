@@ -197,7 +197,7 @@ def app_second_block():
     client = gspread.authorize(creds)
 
 
-    creds_jsons = (st.secrets["script_service_account"])
+    creds_jsons = dict(st.secrets["script_service_account"])
     scoped = [
         'https://www.googleapis.com/auth/script.projects',
         'https://www.googleapis.com/auth/drive',
