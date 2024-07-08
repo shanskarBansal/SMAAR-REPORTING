@@ -196,32 +196,6 @@ def app_second_block():
     client = gspread.authorize(creds)
 
 
-    creds_jsons = st.secrets["script_service_account"]
-    scoped = [
-        'https://www.googleapis.com/auth/script.projects',
-        'https://www.googleapis.com/auth/drive',
-        'https://www.googleapis.com/auth/documents',  
-        'https://www.googleapis.com/auth/spreadsheets' 
-        ]
-    creddd = service_account.Credentials.from_service_account_file(creds_jsons, scoped)
-
-
-    def scripting(creds):
-        delegated_creds = creds.with_subject('krishan.maggo@varaheanalytics.com') 
-        service = build('script', 'v1', credentials=delegated_creds)
-        script_id = '1gzDFr1oJTtAJeTv1uZIvLQe82IkIzWjh0_LT7IaOpPDUuLGKaFHYWvTH'
-        function_name = 'processData'
-        request = {
-            'function': function_name,
-            'devMode': True  
-        }
-        try:
-            response = service.scripts().run(body=request, scriptId=script_id).execute()
-            st.write('Function executed successfully:', response) 
-        except Exception as e:
-            st.write(f"Error executing Apps Script: {str(e)}")
-
-
     def create_weekly_sheet_copy(client, spreadsheet, base_sheet_name):
         current_week_number = datetime.now().isocalendar().week
         new_sheet_name = f"Week_{current_week_number-1}"
