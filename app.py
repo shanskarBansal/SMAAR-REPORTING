@@ -66,7 +66,7 @@ def app_first_block():
         sheet = get_sheet_data(sheet_id)
         sheet_names = [worksheet.title for worksheet in sheet.worksheets()] 
     
-        nltk.download('punkt')
+        nltk.download('punkt_tab')
         nltk.download('stopwords')
         stop_words = set(stopwords.words('english'))
         custom_tokens_to_remove = set()
